@@ -5,12 +5,11 @@ import '../constants_enums.dart';
 import '../controllers/disks_brain.dart';
 
 class AnimationArea extends StatelessWidget {
-  final Status status;
   final DisksBrain disksBrain;
   final Function onTap;
 
   AnimationArea(
-      {required this.status, required this.disksBrain, required this.onTap});
+      {required this.disksBrain, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,7 @@ class AnimationArea extends StatelessWidget {
           children: [
             for (int i = 0; i < 3; i++)
               RodWidget(
-                  rodIndex: i, enabled: status == Status.playing, onTap: onTap),
+                  rodIndex: i, onTap: onTap),
             for (var disk in disksBrain.disks)
               DiskWidget(
                 disk: disk,

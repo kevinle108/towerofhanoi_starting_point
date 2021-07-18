@@ -3,11 +3,10 @@ import '../constants_enums.dart';
 
 class RodWidget extends StatelessWidget {
   final int rodIndex;
-  final bool enabled;
   final Function onTap;
 
   RodWidget(
-      {required this.rodIndex, required this.enabled, required this.onTap});
+      {required this.rodIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class RodWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
-        onTap: enabled ? () => onTap(rodIndex) : null,
+        onTap: () => onTap(rodIndex),
       ),
     );
   }

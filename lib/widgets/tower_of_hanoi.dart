@@ -41,7 +41,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
     setState(() {
       disksBrain.decrementDisks();
       if (disksBrain.disks.length == kMinimumDisks) {
-        setStatus(Status.startingMinimumDisks)
+        setStatus(Status.startingMinimumDisks);
       }
     });
   }
@@ -60,7 +60,10 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
   }
 
   bool canPlay() {
-    return getStatus() == Status.starting;
+    Status status = getStatus();
+    return status == Status.starting
+        || status == Status.startingMaximumDisks
+        || status == Status.startingMinimumDisks;
   }
 
   void play() {
@@ -71,7 +74,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
   }
 
   bool canSolve() {
-    return getStatus() == Status.starting;
+    return canPlay();
   }
 
   Future solve() async {
@@ -97,6 +100,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
   }
 
   Future onTap(int rodIndex) async {
+    if (getStatus() != Status.playing) return;
     setErrMsg('');
     if (fromRodIndex == null) {
       fromRodIndex = rodIndex;
@@ -174,7 +178,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
           Consumer(builder: (context, ref, child) {
             return Text(ref(infoMessageProvider).state, style: TextStyle(fontSize: 16));
           }),
-          AnimationArea(status: status, disksBrain: disksBrain, onTap: onTap),
+          AnimationArea(disksBrain: disksBrain, onTap: onTap),
           SizedBox(
               height: 30,
               child: Container(
