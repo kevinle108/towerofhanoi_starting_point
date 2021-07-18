@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'disk.dart';
+import '../models/disk.dart';
 import '../constants_enums.dart';
 
 class DisksBrain {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'rod_widget.dart';
 import 'disk_widget.dart';
 import '../constants_enums.dart';
-import '../models/disks_brain.dart';
+import '../controllers/disks_brain.dart';
 
 class AnimationArea extends StatelessWidget {
   final Status status;

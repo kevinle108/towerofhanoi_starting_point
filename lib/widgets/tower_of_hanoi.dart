@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:towersofhanoi/providers.dart';
 import '../widgets/animation_area.dart';
-import '../models/disks_brain.dart';
+import '../controllers/disks_brain.dart';
 import '../constants_enums.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TowerOfHanoi extends StatefulWidget {
   @override
@@ -13,87 +15,104 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
   late AnimationController controller;
   late Animation animation;
   late DisksBrain disksBrain;
-  var status = Status.starting;
-  String errorMsg = '';
-  String infoMsg = '';
   int? fromRodIndex;
 
+  void setInfoMsg(String newMsg) {
+    context.read(infoMessageProvider).state = newMsg;
+  }
+
+  void setErrMsg(String newMsg) {
+    context.read(errorMessageProvider).state = newMsg;
+  }
+
+  void setStatus(Status newStatus) {
+    context.read(statusProvider).state = newStatus;
+  }
+
+  Status getStatus() {
+    return context.read(statusProvider).state;
+  }
+
   bool canDecrement() {
-    return status == Status.starting && disksBrain.diskCount > 1;
+    return getStatus() == Status.starting && disksBrain.diskCount > 1;
   }
 
   void decrementDisks() {
     setState(() {
       disksBrain.decrementDisks();
+      if (disksBrain.disks.length == kMinimumDisks) {
+        setStatus(Status.startingMinimumDisks)
+      }
     });
   }
 
   bool canIncrement() {
-    return status == Status.starting && disksBrain.diskCount < 9;
+    return getStatus() == Status.starting && disksBrain.diskCount < 9;
   }
 
   void incrementDisks() {
     setState(() {
       disksBrain.incrementDisks();
+      if (disksBrain.disks.length == kMaximumDisks) {
+        setStatus(Status.startingMaximumDisks);
+      }
     });
   }
 
   bool canPlay() {
-    return status == Status.starting;
+    return getStatus() == Status.starting;
   }
 
   void play() {
     setState(() {
-      infoMsg = kToMoveADisk;
-      status = Status.playing;
+      setInfoMsg(kToMoveADisk);
+      setStatus(Status.starting);
     });
   }
 
   bool canSolve() {
-    return status == Status.starting;
+    return getStatus() == Status.starting;
   }
 
   Future solve() async {
-    status = Status.solving;
-    infoMsg = kSolving;
+    setStatus(Status.solving);
+    setInfoMsg(kSolving);
     disksBrain.reset();
     await moveDisks(disksBrain.diskCount, 0, 2);
-    status = Status.solved;
-    infoMsg = kSolved;
+    setStatus(Status.solved);
+    setInfoMsg(kSolved);
   }
 
   bool canReset() {
-    return status == Status.playing || status == Status.solved;
+    return getStatus() == Status.playing || getStatus() == Status.solved;
   }
 
   void reset() {
     setState(() {
       disksBrain.reset();
-      status = Status.starting;
-      errorMsg = '';
-      infoMsg = '';
+      setStatus(Status.starting);
+      setErrMsg('');
+      setInfoMsg('');
     });
   }
 
   Future onTap(int rodIndex) async {
-    errorMsg = '';
+    setErrMsg('');
     if (fromRodIndex == null) {
       fromRodIndex = rodIndex;
-      infoMsg =
-          'Moving the disk at rod ${String.fromCharCode(rodIndex + 65)} ...';
+      setInfoMsg('Moving the disk at rod ${String.fromCharCode(rodIndex + 65)} ...');
     } else {
-      infoMsg =
-          'Moving the disk at rod ${String.fromCharCode(fromRodIndex! + 65)}' +
-              ' to rod ${String.fromCharCode(rodIndex + 65)}';
-      status = Status.moving;
+      setInfoMsg('Moving the disk at rod ${String.fromCharCode(fromRodIndex! + 65)}' +
+              ' to rod ${String.fromCharCode(rodIndex + 65)}');
+      setStatus(Status.moving);
       await moveDisk(fromRodIndex!, rodIndex);
       fromRodIndex = null;
       if (disksBrain.solved()) {
-        infoMsg = kGotIt;
-        status = Status.solved;
+        setInfoMsg(kGotIt);
+        setStatus(Status.solved);
       } else {
-        infoMsg = kToMoveADisk;
-        status = Status.playing;
+        setInfoMsg(kToMoveADisk);
+        setStatus(Status.playing);
       }
     }
     setState(() {});
@@ -104,7 +123,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
       controller.reset();
       await controller.forward();
     } else {
-      errorMsg = kInvalidMove;
+      setErrMsg(kInvalidMove);
     }
   }
 
@@ -147,8 +166,14 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(errorMsg, style: TextStyle(fontSize: 16, color: Colors.red)),
-          Text(infoMsg, style: TextStyle(fontSize: 16)),
+          // Text(errorMsg, style: TextStyle(fontSize: 16, color: Colors.red)),
+          // Text(infoMsg, style: TextStyle(fontSize: 16)),
+          Consumer(builder: (context, ref, child) {
+            return Text(ref(errorMessageProvider).state, style: TextStyle(fontSize: 16, color: Colors.red));
+          }),
+          Consumer(builder: (context, ref, child) {
+            return Text(ref(infoMessageProvider).state, style: TextStyle(fontSize: 16));
+          }),
           AnimationArea(status: status, disksBrain: disksBrain, onTap: onTap),
           SizedBox(
               height: 30,

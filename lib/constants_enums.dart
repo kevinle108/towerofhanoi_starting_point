@@ -1,3 +1,5 @@
+const int kMinimumDisks = 2;
+const int kMaximumDisks = 90;
 const double kMaxDiskHalfWidth = 60;
 const double kDiskWidthOffset = 4;
 const double kDiskHeight = 20;
@@ -16,6 +18,8 @@ const String kInvalidMove = 'Invalid move. Try again ...';
 
 enum Status {
   starting,
+  startingMinimumDisks,
+  startingMaximumDisks,
   playing,
   moving,
   solving,

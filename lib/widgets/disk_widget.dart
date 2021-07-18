@@ -15,6 +15,7 @@ class DiskWidget extends StatelessWidget {
       child: Container(
         width: disk.halfWidth * 2,
         height: kDiskHeight,
+        child: CircleAvatar(child: Text((disk.diskIndex+1).toString())),
         decoration: BoxDecoration(
           color: Colors.orange,
           // color: (disk.diskIndex % 2 == 0) ? Colors.purple : Colors.orange,
