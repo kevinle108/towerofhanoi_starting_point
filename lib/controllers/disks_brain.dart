@@ -1,21 +1,24 @@
 import 'dart:math';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../models/disk.dart';
 import '../constants_enums.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DisksBrain {
+class DisksBrain extends StateNotifier<List<Disk>>{
   List<List<int>> _stacks = [];
   List<Disk> disks = [];
-  int diskCount = 0;
   int _curDiskIndex = 0;
   var _animationValues = List<double>.filled(9, 0);
   var _animationX = List<double>.filled(9, 0);
   var _animationY = List<double>.filled(9, 0);
 
-  DisksBrain({required this.diskCount}) {
-    reset();
+
+  DisksBrain() : super([]) {
+    reset(3);
   }
 
-  void reset() {
+  void reset(int numOfDisks) {
     // Create 3 empty stacks;
     _stacks.clear();
     for (int i = 0; i < 3; i++) {
@@ -23,7 +26,7 @@ class DisksBrain {
     }
     // Create all disks and place them in stack 0
     disks.clear();
-    for (int i = 0; i < diskCount; i++) {
+    for (int i = 0; i < numOfDisks; i++) {
       disks.add(
           Disk(diskIndex: i, x: 60, y: i * (kDiskHeight + kDiskHeightOffset)));
       _stacks[0].add(i);
@@ -31,16 +34,14 @@ class DisksBrain {
   }
 
   void incrementDisks() {
-    if (diskCount < 9) {
-      diskCount++;
-      reset();
+    if (state.length < 9) {
+      reset(state.length + 1);
     }
   }
 
   void decrementDisks() {
-    if (diskCount > 1) {
-      diskCount--;
-      reset();
+    if (state.length > 1) {
+      reset(state.length - 1);
     }
   }
 
@@ -104,7 +105,7 @@ class DisksBrain {
   }
 
   bool solved() {
-    return _stacks[2].length == diskCount;
+    return _stacks[2].length == state.length;
   }
 
   @override
