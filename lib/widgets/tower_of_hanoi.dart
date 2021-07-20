@@ -34,7 +34,7 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
   }
 
   bool canDecrement() {
-    return getStatus() == Status.starting && disksBrain.diskCount > 1;
+    return (getStatus() == Status.starting || getStatus() == Status.startingMaximumDisks) && disksBrain.diskCount > 1;
   }
 
   void decrementDisks() {
@@ -42,12 +42,14 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
       disksBrain.decrementDisks();
       if (disksBrain.disks.length == kMinimumDisks) {
         setStatus(Status.startingMinimumDisks);
+      } else {
+        setStatus(Status.starting);
       }
     });
   }
 
   bool canIncrement() {
-    return getStatus() == Status.starting && disksBrain.diskCount < 9;
+    return (getStatus() == Status.starting || getStatus() == Status.startingMinimumDisks) && disksBrain.diskCount < 9;
   }
 
   void incrementDisks() {
@@ -55,6 +57,8 @@ class _TowerOfHanoiState extends State<TowerOfHanoi>
       disksBrain.incrementDisks();
       if (disksBrain.disks.length == kMaximumDisks) {
         setStatus(Status.startingMaximumDisks);
+      } else {
+        setStatus(Status.starting);
       }
     });
   }
